@@ -58,38 +58,46 @@ Request Server::decodeRequest(Client client){
         req.requestType = 6;                    //options
     else if (buffer[0]=='T')
         req.requestType = 7;                    //trace
-/*
-    int i = 3;
-    while(buffer[i]!=' ') i++;
-    i++;
-    char route[128];
-    int j = 0;
-    while(buffer[i]!=' ')
-        route[j++] = buffer[++i];
-    for(;j<128;j++) route[j] = ' ';
-    i = 0;
-    j = 0;
 
-    while(route[i]!='?') req.route[i] = route[i++];
-    i++;
+    int i = 3;                                  
+    while(i<1024&&buffer[i]!=' ') i++;
+    while(i<1024&&buffer[i]==' ') i++;                  //vado al primo carattere != ' '
+
+    char address[162];
+    
+    int j = 0;
+
+    while(i<1024&&buffer[i]!=' ')                       //prendo tutto quello che c'è fino al prox spazio e lo salvo in address
+        address[j++] = buffer[++i];
+    for(;j<162;j++) address[j] = ' ';           //
+
+    i = 0;
+    req.route[0] = '/';
+    while(i<162&&address[i]!='?'&&address[i]!=' ') req.route[i] = address[i++];
+    req.route[31] = '\n';
+    i+=2;
+    j = 0;
 
     bool value = false;
     int k = 0;
-    while(route[i]!=' '){
-        if(route[i]=='='){
+    while(i<162&&address[i]!=' '){
+        if(address[i]=='='){
             value = true;
             k = 0;
-        }else if(route[i]=='&'){
+        }else if(address[i]=='&'){
             j++;
             k = 0;
             value = false;
         }else if(value)
-            req.params[j].value[k++] = route[i];
+            req.params[j].value[k++] = address[i];
         else
-            req.params[j].param[k++] = route[i];
+            req.params[j].param[k++] = address[i];
+        i++;
     }
 
-    printf(req.params[0].param);*/
-
     return req;
+}
+
+void Server::handleRequest(Client client, Request req){
+    
 }

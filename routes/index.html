@@ -2,8 +2,25 @@
 <html>
     <head>
         <title>test</title>
+
+        <link rel="stylesheet" href="./style/style.css">
     </head>
     <body>
-        rikione
+        <div id="me">rocky</div>
+        
+        <u1>
+            <li id="home">home</li>
+            <li id="about">about</li>
+            <li id="contact">contact</li></u1>
     </body>
+    <script>
+        let me = document.getElementById("me");
+        let i = 0;
+        
+        setInterval(()=>{
+            i = (i+5)%360;
+            me.style.transform = `rotate(${i}deg)`;
+            me.style.fontSize = (15+5*Math.cos(i*Math.PI/180)) + "px";
+        },50);
+    </script>
 </html>
