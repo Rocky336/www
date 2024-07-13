@@ -8,19 +8,45 @@
     <body>
         <div id="me">rocky</div>
         
-        <u1>
+        <ul>
             <li id="home">home</li>
             <li id="about">about</li>
-            <li id="contact">contact</li></u1>
+            <li id="contact">contact</li>
+        </ul>
+
     </body>
     <script>
         let me = document.getElementById("me");
+        let falling = false;
         let i = 0;
+        let j = -100;
         
+        let fallingdiv = document.createElement("div");
+        fallingdiv.style.position = "absolute";
+        fallingdiv.style.width = "100vw";
+        fallingdiv.style.height = "100vh";
+        fallingdiv.style.backgroundImage = "url('/assets/images/bars.png')";
+        fallingdiv.style.transform = "translateY(-100vh)"
+        document.body.appendChild(fallingdiv);
+        
+
+
         setInterval(()=>{
-            i = (i+5)%360;
+            i = (i+1)%360;
             me.style.transform = `rotate(${i}deg)`;
             me.style.fontSize = (15+5*Math.cos(i*Math.PI/180)) + "px";
-        },50);
+            if(falling) j+=5;
+            if(j>150){
+                j = -100;
+                falling = false;
+                document.body.style.overflowY = "auto";
+            }
+            fallingdiv.style.transform = `translateY(${j}vh)`;
+        },5);
+
+        document.getElementById("contact").addEventListener("click",()=>{
+            falling = true;
+            document.body.style.overflowY = "hidden";
+        })
     </script>
 </html>
