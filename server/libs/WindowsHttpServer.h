@@ -2,6 +2,7 @@
 #include <map>
 #include "Client.h"
 #include "Request.h"
+#include "ResourceManager.h"
 
 struct ClientComparator{
     bool operator() (const Client& lhs, const Client& rhs) const{
@@ -13,6 +14,7 @@ class Server{
     private:
         SOCKET serversocket;
         std::map<Client, SOCKET, ClientComparator> clientpool;
+        ResourceManager resourcepool;
 
     public: 
         Server(const char address[], int port);
@@ -22,5 +24,5 @@ class Server{
         int sendData(Client client, const char buffer[], int length);
         void closeClient(Client client);
         Request decodeRequest(Client client);
-        void handleRequest(Client client, Request req);
+        Response generateResponse(Client client, Request req);
 };

@@ -7,10 +7,7 @@
 #endif
 
 using namespace std;
-
-map<string,const char *> resources;
-map<const char*,string> content;
-
+/*
 void updatecontent(){
     string line_buffer;
 
@@ -23,39 +20,38 @@ void updatecontent(){
             content[x.second] += line_buffer;
         index.close();
     }
+}*/
+string GetLastErrorAsString()
+{
+    //Get the error message ID, if any.
+    DWORD errorMessageID = ::GetLastError();
+    if(errorMessageID == 0) {
+        return string(); //No error message has been recorded
+    }
+    
+    LPSTR messageBuffer = nullptr;
+
+    //Ask Win32 to give us the string version of that message ID.
+    //The parameters we pass in, tell Win32 to create the buffer that holds the message for us (because we don't yet know how long the message string will be).
+    size_t size = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                                 NULL, errorMessageID, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&messageBuffer, 0, NULL);
+    
+    //Copy the error message into a std::string.
+    string message(messageBuffer, size);
+    
+    //Free the Win32's string's buffer.
+    LocalFree(messageBuffer);
+            
+    return message;
 }
 
-int main(int argc, char* argv[]){
-    resources["/style/style.css"] = "../routes/style/style.css";
-    resources["/assets/images/bars.png"] = "../routes/assets/images/bars.png";
-    resources["/index.html"] = "../routes/index.html";
-    resources["/favicon.ico"] = "../routes/index.html";
-    resources["/"] = "../routes/index.html";
 
+int main(int argc, char* argv[]){
     const char ip[] = "127.0.0.1";
     Server server(ip,8080);
     server.startListening();
 
-    string line_buffer;
-
-    for (auto const& x : resources){
-        if(content.count(x.second)) continue;
-
-        ifstream index(x.second);
-        line_buffer = "";
-        while(getline(index,line_buffer)) 
-            content[x.second] += line_buffer;
-        index.close();
-    }
-
-    ifstream index("../routes/not_found.html");
-    line_buffer = "";
-    while(getline(index,line_buffer)) 
-        content["not_found"] += line_buffer;
-    index.close();
-
-    string header = "HTTP/2 200\n;\nContent-Type:";
-    string bad = "HTTP/2 404\n";
+    string header = "HTTP/1.1 ";
 
     Client client;
 
@@ -63,35 +59,12 @@ int main(int argc, char* argv[]){
 
     while(server.acceptClient(client)){
         Request req = server.decodeRequest(client);
-        string result = "";
-        string route = "";
-        string contenttype = "";
-        i = 0;
-        while(i<32&&req.route[i]!=' ') route+=req.route[i++];
-
-        auto res = resources.find(route);
-
-        i = route.length()-1;
-        while(i>=0&&route.at(i)!='.')
-            contenttype = route.at(i--) + contenttype;
-
-        if(contenttype=="png") contenttype = "image/png";
-        else if(contenttype=="ico") contenttype = "image/vnd.microsoft.icon";
-        else if(contenttype=="html"||contenttype=="/") contenttype = "text/html";
-        else if(contenttype=="css") contenttype = "text/css";
-        else if(contenttype=="js") contenttype = "text/javascript";
-        else contenttype = "text/plain";
+        Response res = server.generateResponse(client,req);
         
-        printf(contenttype.data());
-
-        if(res!=resources.end()){
-            result += header + contenttype +";\nContent-Length:"+ to_string(strlen(content[res->second].data())) + "\n\n" + content[res->second];
-        }else{
-            result += bad + to_string(strlen(content["not_found"].data())) + "\n\n" + content["not_found"];
-        }
-        server.sendData(client,result.data(),strlen(result.data()));
+        string response = header+ to_string(res.response_status) + " OK\nContent-Type: "+res.content_type+"\nContent-Length: "+to_string(strlen(res.data))+"\n\n"+res.data;
+        
+        server.sendData(client,response.data(),response.length());
         server.closeClient(client);
-        updatecontent();
     }
 
     return 0;

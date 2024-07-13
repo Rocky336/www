@@ -1,4 +1,6 @@
+*.bat
 *.o
 *.a
 *.dll
 *.exe
+.vscode/settings.json

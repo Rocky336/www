@@ -1,7 +1,9 @@
+#include <string>
+
 class Params{
     public:
-        char param[16];
-        char value[16];
+        std::string param_name;
+        std::string string_value;
 
         Params();
 };

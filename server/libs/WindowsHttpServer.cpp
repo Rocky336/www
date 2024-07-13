@@ -72,32 +72,36 @@ Request Server::decodeRequest(Client client){
     for(;j<162;j++) address[j] = ' ';           //
 
     i = 0;
-    req.route[0] = '/';
-    while(i<162&&address[i]!='?'&&address[i]!=' ') req.route[i] = address[i++];
-    req.route[31] = '\n';
-    i+=2;
+    bool value = false;
+
+    while(i<162&&address[i]!='?'&&address[i]!=' ')
+        req.route_string += address[i++];
+
+    i++;
     j = 0;
 
-    bool value = false;
-    int k = 0;
+    value = false;
+
     while(i<162&&address[i]!=' '){
-        if(address[i]=='='){
+        if(address[i]=='=')
             value = true;
-            k = 0;
-        }else if(address[i]=='&'){
+        else if(address[i]=='&'){
             j++;
-            k = 0;
             value = false;
         }else if(value)
-            req.params[j].value[k++] = address[i];
+            req.params[j].string_value += address[i];
         else
-            req.params[j].param[k++] = address[i];
+            req.params[j].param_name += address[i];
         i++;
     }
-
+    
     return req;
 }
 
-void Server::handleRequest(Client client, Request req){
-    
+Response Server::generateResponse(Client client, Request req){
+    Response res;
+    if(req.requestType==0){
+        if(req.route_string=="/") req.route_string = "/index.html";
+        return resourcepool.getResource(req.route_string);
+    }
 }

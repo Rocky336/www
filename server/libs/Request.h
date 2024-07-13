@@ -1,9 +1,10 @@
 #include "Params.h"
+#include <string>
 
 class Request{
     public:
         int requestType;
-        char route[32];
+        std::string route_string;
         Params params[5];
         
         Request();
