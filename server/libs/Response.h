@@ -10,4 +10,5 @@ class Response{
         std::string datastring;
         
         Response();
+        Response(int rs, std::string content, std::string type);
 };
