@@ -14,6 +14,7 @@ class Server{
     private:
         SOCKET serversocket;
         std::map<Client, SOCKET, ClientComparator> clientpool;
+        std::map<std::string,Response (*)(Request)> endpoints;
         ResourceManager resourcepool;
 
     public: 
@@ -23,6 +24,7 @@ class Server{
         int receiveData(Client client, char buffer[], int length);
         int sendData(Client client, const char buffer[], int length);
         void closeClient(Client client);
+        void addEndpoint(std::string name,Response (*function)(Request));
         Request decodeRequest(Client client);
         Response generateResponse(Client client, Request req);
 };

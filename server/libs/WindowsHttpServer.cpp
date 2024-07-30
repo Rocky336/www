@@ -39,6 +39,7 @@ void Server::closeClient(Client client){
 Request Server::decodeRequest(Client client){
     char buffer[1024];
     receiveData(client,buffer,1024);
+    printf(buffer);
 
     Request req;
 
@@ -99,9 +100,13 @@ Request Server::decodeRequest(Client client){
 }
 
 Response Server::generateResponse(Client client, Request req){
-    Response res;
     if(req.requestType==0){
         if(req.route_string=="/") req.route_string = "/index.html";
+        if(endpoints[req.route_string]) return endpoints[req.route_string](req);
         return resourcepool.getResource(req.route_string);
     }
+}
+
+void Server::addEndpoint(std::string name,Response (*function)(Request)){
+    endpoints[name] = function;
 }

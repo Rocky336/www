@@ -27,6 +27,15 @@ void ResourceManager::recursiveSearch(std::string dir){
     closedir(dirp);
     delete dp;
 }
+/*
+void ResourceManager::loadContentTypes(){
+    std::ifstream file("./resources/content_types.csv",std::ios::binary);
+    std::string line;
+    int i;
+    while(getline(file,line)){
+        contenttypes[line.substr(0,line.find(','))] = line.substr(line.find(',')+2,line.find(',',line.find(',')+2));
+    }
+}*/
 
 ResourceManager::ResourceManager(){
     //recursiveSearch("E:/www/routes/");
@@ -40,34 +49,32 @@ Response ResourceManager::getResource(std::string route){
 
     response.content_type = "";
     while(i>=0&&route.at(i)!='.')  response.content_type = route.at(i--) + response.content_type;
-    
 
     if(response.content_type=="png") response.content_type = "image/png";
     else if(response.content_type=="ico") response.content_type = "image/vnd.microsoft.icon";
     else if(response.content_type=="html"||response.content_type=="") response.content_type = "text/html";
     else if(response.content_type=="css") response.content_type = "text/css";
     else if(response.content_type=="js") response.content_type = "text/javascript";
+    else if(response.content_type=="json") response.content_type = "application/json";
     else response.content_type = "text/plain";
-    
-    std::ifstream index("E:/www/routes"+route,std::ios::binary);
-        
+
+    std::ifstream index("../routes"+route,std::ios::binary);
     std::vector<char> bytes(std::istreambuf_iterator<char>(index),(std::istreambuf_iterator<char>()));
     
     for(i=0;i<bytes.size();i++)
         response.datastring += bytes.at(i);
-    
 
     if(bytes.size()!=0){
         response.content_length = bytes.size();
         response.response_status = 200;
     }else{
-        
-        std::ifstream index("E:/www/routes/not_found.html",std::ios::binary);
+        std::ifstream index("../routes/not_found.html",std::ios::binary);
         std::vector<char> bytes(std::istreambuf_iterator<char>(index),(std::istreambuf_iterator<char>()));
         
         for(i=0;i<bytes.size();i++)
             response.datastring += bytes.at(i);
-        
+
+        response.content_type = "text/html";
         response.content_length = bytes.size();
         response.response_status = 404;
     }

@@ -14,6 +14,7 @@
             <li id="contact">contact</li>
         </ul>
 
+        <div id="sphere"></div>
     </body>
     <script>
         let me = document.getElementById("me");
@@ -28,8 +29,6 @@
         fallingdiv.style.backgroundImage = "url('/assets/images/bars.png')";
         fallingdiv.style.transform = "translateY(-100vh)"
         document.body.appendChild(fallingdiv);
-        
-
 
         setInterval(()=>{
             i = (i+1)%360;
@@ -48,5 +47,144 @@
             falling = true;
             document.body.style.overflowY = "hidden";
         })
+    </script>
+    <script>
+        let icons = [
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+            "/favicon.ico",
+        ];
+        
+
+        let x,y,z;
+        let img;
+        let sphere = document.getElementById("sphere");
+        let compstyle = window.getComputedStyle(sphere);
+        let radius = Number(compstyle.width.substring(0,compstyle.width.length-2));
+        let ss;
+
+        icons.forEach((icon,index)=>{
+
+            const phi = Math.acos(1 - 2 * (index + 0.5) / icons.length);
+            const theta = Math.PI * (1 + Math.sqrt(5)) * (index + 0.5);
+
+            x = Math.cos(theta) * Math.sin(phi);
+            y = Math.sin(theta) * Math.sin(phi);
+            z = Math.cos(phi);
+
+            img = document.createElement("img");
+            img.className = "icon_sphere";
+            sphere.appendChild(img);
+            //img.src = icons[index];
+            icons[index] = img;
+            
+            ss = Number(window.getComputedStyle(img).width.substring(0,window.getComputedStyle(img).width.length-2));
+            img.style.transform = `translate3d(${(x+1)*.5*radius-ss*.5}px,${(y+1)*.5*radius-ss*.5}px,${z*radius*.5}px) rotateZ(${theta}rad) rotateY(${phi}rad)`;
+            img.style.opacity = `${(z+1)*50}%`
+        })
+
+        let lastpos = [0,0];
+        let dir = [0,0];
+        let rot = [0,0];
+        let md = false;
+        let inertia = false;
+
+        sphere.addEventListener("mousedown",(event)=>{
+            inertia = false;
+            md = true;
+            lastpos[0] = event.clientX;
+            lastpos[1] = event.clientY;
+        })
+
+        window.addEventListener("mousemove",(event)=>{
+            if(!md) return;
+            dir[0] = event.clientX-lastpos[0];
+            dir[1] = event.clientY-lastpos[1];
+            lastpos[0] = event.clientX;
+            lastpos[1] = event.clientY;
+            rot[0] += dir[0];
+            rot[1] -= dir[1]; 
+            console.log(dir[0]+" "+dir[1]);
+        })
+
+        window.addEventListener("mouseup",(event)=>{
+            if(md){
+                md = false;
+                if(Math.abs(dir[0])>2||Math.abs(dir[1])>>2){
+                    inertia = true;
+                }
+            }
+        })
+
+        function render(dt){
+            if(inertia){
+                rot[0] += dir[0];
+                rot[1] -= dir[1]; 
+                dir[0]*=0.95;
+                dir[1]*=0.95;
+            }
+            sphere.style.transform = `rotateX(${rot[1]}deg) rotateY(${rot[0]}deg)`;
+            window.requestAnimationFrame(render)
+        }
+
+        window.requestAnimationFrame(render)
     </script>
 </html>
