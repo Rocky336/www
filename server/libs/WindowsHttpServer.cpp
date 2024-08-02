@@ -101,12 +101,13 @@ Request Server::decodeRequest(Client client){
 
 Response Server::generateResponse(Client client, Request req){
     if(req.route_string.find("..")!=std::string::npos)
-        return *(new Response(200,"gay","plain/text"));
+        return *(new Response(200,"gay","text/plain"));
     if(req.requestType==0){
         if(req.route_string=="/") req.route_string = "/index.html";
         if(endpoints[req.route_string]) return endpoints[req.route_string](req);
         return resourcepool.getResource(req.route_string);
     }
+    return *(new Response(404,"Not found","text/plain"));
 }
 
 void Server::addEndpoint(std::string name,Response (*function)(Request)){

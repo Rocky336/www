@@ -17,6 +17,25 @@ Response gayFunction(Request req){
     return r;
 }
 
+void handleExit(){
+    DWORD errorMessageID = ::GetLastError();
+    if(errorMessageID == 0) {
+        return;
+    }
+    
+    LPSTR messageBuffer = nullptr;
+    size_t size = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                                 NULL, errorMessageID, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&messageBuffer, 0, NULL);
+    
+    std::string message(messageBuffer, size);
+    
+    LocalFree(messageBuffer);
+    ofstream file("log.txt");
+    file<<message;
+    file.close();
+    free(&file);
+}
+
 int main(int argc, char* argv[]){
     const char ip[] = "192.168.1.53";
     Server server(ip,80);
@@ -40,6 +59,8 @@ int main(int argc, char* argv[]){
         server.sendData(client,response.data(),response.length());
         server.closeClient(client);
     }
+
+    std::atexit(handleExit);
 
     return 0;
 }
