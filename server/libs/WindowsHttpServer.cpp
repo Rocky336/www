@@ -100,7 +100,8 @@ Request Server::decodeRequest(Client client){
 }
 
 Response Server::generateResponse(Client client, Request req){
-    if(req.route_string.find("..")) return *(new Response(200,"gay","plain/text"));
+    if(req.route_string.find("..")!=std::string::npos)
+        return *(new Response(200,"gay","plain/text"));
     if(req.requestType==0){
         if(req.route_string=="/") req.route_string = "/index.html";
         if(endpoints[req.route_string]) return endpoints[req.route_string](req);
