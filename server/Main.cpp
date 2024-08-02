@@ -33,7 +33,6 @@ void handleExit(){
     ofstream file("log.txt");
     file<<message;
     file.close();
-    free(&file);
 }
 
 int main(int argc, char* argv[]){
