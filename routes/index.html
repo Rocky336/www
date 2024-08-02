@@ -17,11 +17,6 @@
         <div id="sphere"></div>
     </body>
     <script>
-        let me = document.getElementById("me");
-        let falling = false;
-        let i = 0;
-        let j = -100;
-        
         let fallingdiv = document.createElement("div");
         fallingdiv.style.position = "absolute";
         fallingdiv.style.width = "100vw";
@@ -30,25 +25,6 @@
         fallingdiv.style.transform = "translateY(-100vh)"
         document.body.appendChild(fallingdiv);
 
-        setInterval(()=>{
-            i = (i+1)%360;
-            me.style.transform = `rotate(${i}deg)`;
-            me.style.fontSize = (15+5*Math.cos(i*Math.PI/180)) + "px";
-            if(falling) j+=5;
-            if(j>150){
-                j = -100;
-                falling = false;
-                document.body.style.overflowY = "auto";
-            }
-            fallingdiv.style.transform = `translateY(${j}vh)`;
-        },5);
-
-        document.getElementById("contact").addEventListener("click",()=>{
-            falling = true;
-            document.body.style.overflowY = "hidden";
-        })
-    </script>
-    <script>
         let icons = [
             "/favicon.ico",
             "/favicon.ico",
@@ -113,6 +89,8 @@
             "/favicon.ico",
         ];
         
+        let falling = false;
+        let y_pos = -100;
 
         let x,y,z;
         let img;
@@ -134,11 +112,26 @@
             img.className = "icon_sphere";
             sphere.appendChild(img);
             //img.src = icons[index];
-            icons[index] = img;
+            icons[index] = [img,theta,phi];
             
             ss = Number(window.getComputedStyle(img).width.substring(0,window.getComputedStyle(img).width.length-2));
             img.style.transform = `translate3d(${(x+1)*.5*radius-ss*.5}px,${(y+1)*.5*radius-ss*.5}px,${z*radius*.5}px) rotateZ(${theta}rad) rotateY(${phi}rad)`;
             img.style.opacity = `${(z+1)*50}%`
+        })
+
+        window.addEventListener("resize",()=>{
+            compstyle = window.getComputedStyle(sphere);
+            radius = Number(compstyle.width.substring(0,compstyle.width.length-2));
+            icons.forEach((array,index)=>{
+                x = Math.cos(array[1]) * Math.sin(array[2]);
+                y = Math.sin(array[1]) * Math.sin(array[2]);
+                z = Math.cos(array[2]);
+                img = array[0];
+
+                ss = Number(window.getComputedStyle(img).width.substring(0,window.getComputedStyle(img).width.length-2));
+                img.style.transform = `translate3d(${(x+1)*.5*radius-ss*.5}px,${(y+1)*.5*radius-ss*.5}px,${z*radius*.5}px) rotateZ(${array[1]}rad) rotateY(${array[2]}rad)`;
+            })
+            
         })
 
         let lastpos = [0,0];
@@ -162,7 +155,6 @@
             lastpos[1] = event.clientY;
             rot[0] += dir[0];
             rot[1] -= dir[1]; 
-            console.log(dir[0]+" "+dir[1]);
         })
 
         window.addEventListener("mouseup",(event)=>{
@@ -174,6 +166,11 @@
             }
         })
 
+        document.getElementById("contact").addEventListener("click",()=>{
+            falling = true;
+            document.body.style.overflowY = "hidden";
+        })
+
         function render(dt){
             if(inertia){
                 rot[0] += dir[0];
@@ -182,6 +179,15 @@
                 dir[1]*=0.95;
             }
             sphere.style.transform = `rotateX(${rot[1]}deg) rotateY(${rot[0]}deg)`;
+
+            if(falling) y_pos+=10;
+            if(y_pos>150){
+                y_pos = -100;
+                falling = false;
+                document.body.style.overflowY = "auto";
+            }
+            fallingdiv.style.transform = `translateY(${y_pos}vh)`;
+
             window.requestAnimationFrame(render)
         }
 

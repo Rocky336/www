@@ -33,6 +33,7 @@ li:hover{
     position:absolute;
     margin-top: 2vw;
     margin-left: 2vw;
+    animation: rotate-title 1s infinite linear;
 }
 
 #sphere{
@@ -53,11 +54,16 @@ li:hover{
     transform-style: preserve-3d;
 }
 
-@keyframes rotate-sfera {
+@keyframes rotate-title{
     0% {
-        transform: rotateX(0deg) rotateY(0deg);
+        transform: rotate(0deg);
+        font-size: small;
+    }
+    50% {
+        font-size: large;
     }
     100% {
-        transform: rotateX(360deg) rotateY(360deg);
+        transform: rotate(360deg);
+        font-size: small;
     }
 }
