@@ -39,7 +39,7 @@ void Server::closeClient(Client client){
 Request Server::decodeRequest(Client client){
     char buffer[1024];
     receiveData(client,buffer,1024);
-    printf(buffer);
+    //printf(buffer);
 
     Request req;
 
@@ -96,6 +96,19 @@ Request Server::decodeRequest(Client client){
         i++;
     }
     
+    i = 0;
+    while(i<1017){
+        if(buffer[i]=='\n'&&buffer[i+1]=='C'&&buffer[i+2]=='o'&&buffer[i+3]=='o'&&buffer[i+4]=='k'&&buffer[i+5]=='i'&&buffer[i+6]=='e'&&buffer[i+7]==':'){
+            break;
+        }
+        i++;
+    }
+    i+=9;
+
+    while(i<1024&&buffer[i]!='\n'){
+        req.cookies += buffer[i++];
+    }
+
     return req;
 }
 

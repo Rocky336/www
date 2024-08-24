@@ -5,6 +5,7 @@ class Request{
     public:
         int requestType;
         std::string route_string;
+        std::string cookies;
         Params params[5];
         
         Request();

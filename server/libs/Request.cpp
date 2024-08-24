@@ -3,4 +3,5 @@
 Request::Request(){
     requestType = -1;
     route_string = "/";
+    cookies = "";
 }
